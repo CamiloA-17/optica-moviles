@@ -1,6 +1,9 @@
 {
   "name": "optica-moviles",
   "version": "0.0.1",
+  "engines": {
+    "node": "20"
+  },
   "description": "",
   "author": "",
   "private": true,
