@@ -20,7 +20,4 @@ export class Sales {
 
   @Column()
   date: string;
-
-  @Column()
-  product_image: string;
 }

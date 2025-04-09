@@ -2,12 +2,12 @@ import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
 export class CreateSalesDto {
   @IsNotEmpty()
-  @IsNumber()
-  client_id: number;
+  @IsString()
+  clientId: string;
 
   @IsNotEmpty()
   @IsNumber()
-  product_id: number;
+  glassesId: number;
 
   @IsNotEmpty()
   @IsNumber()
@@ -18,7 +18,4 @@ export class CreateSalesDto {
   @IsString()
   date: string;
 
-  @IsNotEmpty()
-  @IsString()
-  product_image: string;
 }
