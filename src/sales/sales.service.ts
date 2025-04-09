@@ -33,9 +33,19 @@ export class SalesService {
     return this.salesRepository.save(newSale);
   }
 
-  async update(id: number, updateData: Partial<Sales>): Promise<Sales> {
+  async update(id: number, updateData: {
+    clientId?: string;
+    glassesId?: number;
+    total?: number;
+    date?: string;
+  }): Promise<Sales> {
     const sale = await this.findOne(id);
-    Object.assign(sale, updateData);
+    const updatedData = {
+      ...updateData,
+      glasses: updateData.glassesId ? { id: updateData.glassesId } : sale.glasses,
+      client: updateData.clientId ? { id: updateData.clientId } : sale.client
+    };
+    Object.assign(sale, updatedData);
     return this.salesRepository.save(sale);
   }
 

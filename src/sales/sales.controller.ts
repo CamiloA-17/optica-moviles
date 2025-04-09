@@ -70,8 +70,33 @@ export class SalesController {
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() updateData: Partial<Sales>) {
-    return this.salesService.update(id, updateData);
+  async update(@Param('id') id: number, @Body() updateData: {
+    clientId?: string;
+    glassesId?: number;
+    total?: number;
+    date?: string;
+  }) {
+    try {
+      if (updateData.glassesId) {
+        const glasses = await this.glassesService.findOne(updateData.glassesId);
+        if (!glasses) {
+          throw new BadRequestException('Las gafas especificadas no existen');
+        }
+      }
+
+      const updatedSale = await this.salesService.update(id, updateData);
+      const saleWithRelations = await this.salesService.findOne(id);
+      
+      return {
+        ...saleWithRelations,
+        glasses: saleWithRelations.glasses ? {
+          ...saleWithRelations.glasses,
+          imagen: `http://192.168.1.6:3000/${saleWithRelations.glasses.imagen.replace(/\\/g, '/')}`
+        } : null
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Delete(':id')
