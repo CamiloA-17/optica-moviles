@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Glasses } from './entities/glasses.entity';
 import { CreateGlassesDto } from './dto/create-glasses.dto';
 import { UpdateGlassesDto } from './dto/update-glasses.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class GlassesService {
@@ -35,7 +37,47 @@ export class GlassesService {
     return await this.glassesRepository.save(glasses);
   }
 
+  async removeMultiple(ids: number[]): Promise<{ deleted: number, notFound: number[] }> {
+    const notFound: number[] = [];
+    let deleted = 0;
+
+    for (const id of ids) {
+      try {
+        const glasses = await this.findOne(id);
+        
+        // Eliminar la imagen del sistema de archivos
+        if (glasses.imagen) {
+          const imagePath = path.resolve(glasses.imagen);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        }
+        
+        await this.glassesRepository.delete(id);
+        deleted++;
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          notFound.push(id);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    return { deleted, notFound };
+  }
+
   async remove(id: number): Promise<void> {
+    const glasses = await this.findOne(id);
+    
+    // Eliminar la imagen del sistema de archivos
+    if (glasses.imagen) {
+      const imagePath = path.resolve(glasses.imagen);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+    
     const result = await this.glassesRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Glasses with ID ${id} not found`);
