@@ -14,12 +14,11 @@ export class SalesController {
   @Get()
   async findAll() {
     const sales = await this.salesService.findAll();
-    // Modificar las ventas para incluir la imagen de las gafas
     return sales.map(sale => ({
       ...sale,
       glasses: sale.glasses ? {
         ...sale.glasses,
-        imagen: `http://192.168.1.6:3000/${sale.glasses.imagen}`
+        imagen: `http://192.168.1.6:3000/${sale.glasses.imagen.replace(/\\/g, '/')}`
       } : null
     }));
   }
@@ -31,7 +30,7 @@ export class SalesController {
       ...sale,
       glasses: sale.glasses ? {
         ...sale.glasses,
-        imagen: `http://192.168.1.6:3000/${sale.glasses.imagen}`
+        imagen: `http://192.168.1.6:3000/${sale.glasses.imagen.replace(/\\/g, '/')}`
       } : null
     };
   }
