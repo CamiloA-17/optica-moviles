@@ -1,25 +1,19 @@
-import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateGlassesDto {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   marca: string;
 
-  @IsNotEmpty()
   @IsString()
-  imagen: string;
-
   @IsNotEmpty()
-  @IsNumber()
-  @Min(0)
-  precio: number;
-
-  @IsNotEmpty()
-  @IsString()
   material: string;
 
-  @IsNotEmpty()
   @IsNumber()
-  @Min(0)
+  @IsNotEmpty()
+  precio: number;
+
+  @IsNumber()
+  @IsNotEmpty()
   stock: number;
 } 
