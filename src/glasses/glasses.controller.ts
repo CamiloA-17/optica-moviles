@@ -82,6 +82,14 @@ export class GlassesController {
     return this.glassesService.update(+id, updateGlassesDto);
   }
 
+  @Delete()
+  removeMultiple(@Body() data: { ids: number[] }) {
+    if (!data.ids || !Array.isArray(data.ids) || data.ids.length === 0) {
+      throw new BadRequestException('Se requiere un array de IDs válido');
+    }
+    return this.glassesService.removeMultiple(data.ids);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.glassesService.remove(+id);
