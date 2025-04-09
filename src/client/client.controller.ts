@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { Client } from './client.entity';
 
@@ -19,12 +19,17 @@ export class ClientController {
 
     @Get(':id')
     async findOne(@Param('id') id: string) {
-        return this.clientsService.findOne(id);
+        return this.clientsService.findOneById(id);
+    }
+
+    @Put(':id')
+    async update(@Param('id') id: string, @Body() updateData: Partial<Client>) {
+        return this.clientsService.updateClient(id, updateData);
     }
 
     @Delete(':id')
     async remove(@Param('id') id: string) {
-        return this.clientsService.remove(id);
+        return this.clientsService.removeClient(id);
     }
 
 }
