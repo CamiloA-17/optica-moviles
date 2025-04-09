@@ -31,9 +31,12 @@ export class GlassesService {
     return glasses;
   }
 
-  async update(id: number, updateGlassesDto: UpdateGlassesDto): Promise<Glasses> {
+  async update(id: number, updateGlassesDto: any): Promise<Glasses> {
     const glasses = await this.findOne(id);
+    
+    // Actualizar los campos
     Object.assign(glasses, updateGlassesDto);
+    
     return await this.glassesRepository.save(glasses);
   }
 
