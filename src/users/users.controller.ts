@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './users.entity';
 
@@ -15,4 +15,14 @@ export class UsersController {
     findOneById(@Param('id') id: string) {
         return this.usersService.findOneById(id);
     }
-} 
+
+    @Put(':id')
+    updateUser(@Param('id') id: string, @Body() updateData: Partial<User>) {
+        return this.usersService.updateUser(id, updateData);
+    }
+
+    @Delete(':id')
+    removeUser(@Param('id') id: string) {
+        return this.usersService.removeUser(id);
+    }
+}

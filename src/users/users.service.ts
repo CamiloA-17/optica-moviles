@@ -1,6 +1,6 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { User } from './users.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -29,5 +29,51 @@ export class UsersService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
         return user;
+    }
+
+    async updateUser(id: string, updateData: Partial<User>): Promise<{ statusCode: number, message: string }> {
+        const user = await this.findOneById(id);
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        if (updateData.password) {
+            return {
+                statusCode: 400,
+                message: 'Password cannot be updated directly'
+            }
+        }
+
+        if (updateData.email) {
+            const existingUser = await this.userRepository.findOne({ where: { email: updateData.email, id: Not(id) } });
+            if (existingUser) {
+                return {
+                    statusCode: 409,
+                    message: 'Email already in use'
+                }
+            }
+        }
+
+        Object.assign(user, updateData);
+        await this.userRepository.save(user);
+        return {
+            statusCode: 200,
+            message: `User with ID ${id} updated successfully`
+        };
+    }
+
+    async removeUser(id: string): Promise<{ statusCode: number, message: string }> {
+        const user = await this.findOneById(id);
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        await this.userRepository.remove(user);
+        return {
+            statusCode: 200,
+            message: `User with ID ${id} deleted successfully`
+        };
     }
 }
