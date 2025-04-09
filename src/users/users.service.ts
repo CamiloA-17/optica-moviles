@@ -38,13 +38,6 @@ export class UsersService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
-        if (updateData.password) {
-            return {
-                statusCode: 400,
-                message: 'Password cannot be updated directly'
-            }
-        }
-
         if (updateData.email) {
             const existingUser = await this.userRepository.findOne({ where: { email: updateData.email, id: Not(id) } });
             if (existingUser) {
