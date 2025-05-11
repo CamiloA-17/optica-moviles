@@ -18,11 +18,11 @@ export class UsersController {
 
     @Put(':id')
     updateUser(@Param('id') id: string, @Body() updateData: Partial<User>) {
-        return this.usersService.updateUser(id, updateData);
+        return this.usersService.updateUser({ id, ...updateData });
     }
 
     @Delete(':id')
     removeUser(@Param('id') id: string) {
-        return this.usersService.removeUser(id);
+        return this.usersService.deleteUser(id);
     }
 }

@@ -7,13 +7,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
-  // Habilitar CORS
   app.enableCors();
 
-  // Habilitar validación global
   app.useGlobalPipes(new ValidationPipe());
 
-  // Servir archivos estáticos desde el directorio 'uploads'
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads',
   });

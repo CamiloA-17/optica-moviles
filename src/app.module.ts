@@ -9,6 +9,7 @@ import { GlassesModule } from './glasses/glasses.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SalesModule } from './sales/sales.module';
 import { ClinicalHistoryModule } from './clinical-history/clinical-history.module';
+import { DeviceTokenModule } from './device-token/device-token.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ClinicalHistoryModule } from './clinical-history/clinical-history.modul
     GlassesModule,
     SalesModule,
     ClinicalHistoryModule,
+    DeviceTokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],
