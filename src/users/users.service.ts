@@ -31,42 +31,20 @@ export class UsersService {
         return user;
     }
 
-    async updateUser(id: string, updateData: Partial<User>): Promise<{ statusCode: number, message: string }> {
-        const user = await this.findOneById(id);
-
+    async updateUser(userData: Partial<User>): Promise<User> {
+        const user = await this.userRepository.findOne({ where: { id: userData.id } });
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(`User with ID ${userData.id} not found`);
         }
-
-        if (updateData.email) {
-            const existingUser = await this.userRepository.findOne({ where: { email: updateData.email, id: Not(id) } });
-            if (existingUser) {
-                return {
-                    statusCode: 409,
-                    message: 'Email already in use'
-                }
-            }
-        }
-
-        Object.assign(user, updateData);
-        await this.userRepository.save(user);
-        return {
-            statusCode: 200,
-            message: `User with ID ${id} updated successfully`
-        };
+        Object.assign(user, userData);
+        return await this.userRepository.save(user);
     }
 
-    async removeUser(id: string): Promise<{ statusCode: number, message: string }> {
-        const user = await this.findOneById(id);
-
+    async deleteUser(id: string): Promise<void> {
+        const user = await this.userRepository.findOne({ where: { id } });
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-
         await this.userRepository.remove(user);
-        return {
-            statusCode: 200,
-            message: `User with ID ${id} deleted successfully`
-        };
     }
 }
