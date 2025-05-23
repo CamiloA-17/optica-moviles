@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, HttpStatus } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { Client } from './client.entity';
+import { CreateClientDto } from './dto/create-client.dto';
 
 @Controller('clients')
 export class ClientController {
@@ -8,7 +9,7 @@ export class ClientController {
     constructor(private clientsService: ClientService) {}
 
     @Post()
-    async create(@Body() client: Client) {
+    async create(@Body() client: CreateClientDto) {
         return this.clientsService.create(client);
     }
 
