@@ -7,6 +7,8 @@ import { UpdateGlassesDto } from './dto/update-glasses.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 
+const DEFAULT_IMAGE = 'uploads/glasses/default-glasses.jpg';
+
 @Injectable()
 export class GlassesService {
   constructor(
@@ -48,8 +50,8 @@ export class GlassesService {
       try {
         const glasses = await this.findOne(id);
         
-        // Eliminar la imagen del sistema de archivos
-        if (glasses.imagen) {
+        // Eliminar la imagen del sistema de archivos solo si no es la imagen por defecto
+        if (glasses.imagen && glasses.imagen !== DEFAULT_IMAGE) {
           const imagePath = path.resolve(glasses.imagen);
           if (fs.existsSync(imagePath)) {
             fs.unlinkSync(imagePath);
@@ -73,8 +75,8 @@ export class GlassesService {
   async remove(id: number): Promise<void> {
     const glasses = await this.findOne(id);
     
-    // Eliminar la imagen del sistema de archivos
-    if (glasses.imagen) {
+    // Eliminar la imagen del sistema de archivos solo si no es la imagen por defecto
+    if (glasses.imagen && glasses.imagen !== DEFAULT_IMAGE) {
       const imagePath = path.resolve(glasses.imagen);
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
