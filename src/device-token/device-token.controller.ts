@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Patch, Get } from '@nestjs/common';
 import { DeviceTokenService } from './device-token.service'; 
 import { DeviceTokenDto } from 'src/device-token/dto/register-device-token.dto'; 
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -6,6 +6,12 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @Controller('device-tokens')
 export class DeviceTokenController {
   constructor(private readonly deviceTokenService: DeviceTokenService) {}
+
+
+  @Get()
+  async findAll() {
+    return this.deviceTokenService.findAll();
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('register')

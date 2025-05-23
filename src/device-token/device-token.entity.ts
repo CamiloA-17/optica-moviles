@@ -18,7 +18,7 @@ export class DeviceToken {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user: User;
 
