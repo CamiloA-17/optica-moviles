@@ -53,7 +53,7 @@ export class UsersService {
             await this.deviceTokenService.deleteAllTokensByUserId(id);
 
             // Luego eliminamos el usuario
-            await this.userRepository.remove(user);
+        await this.userRepository.remove(user);
 
             return {
                 statusCode: 200,
