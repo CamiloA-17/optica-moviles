@@ -59,7 +59,7 @@ export class GlassesController {
     // Modificar las rutas de las imágenes para que sean URLs completas
     return glasses.map(glass => ({
       ...glass,
-      imagen: `http://192.168.1.2:3000/${glass.imagen}` // Ajusta la URL base según tu configuración
+      imagen: `https://optica-moviles.up.railway.app/${glass.imagen}` // Ajusta la URL base según tu configuración
     }));
   }
 
