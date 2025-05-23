@@ -1,12 +1,14 @@
 import { Injectable, Inject, NotFoundException, ConflictException, HttpStatus } from '@nestjs/common';
 import { Repository, Not } from 'typeorm';
 import { Client } from './client.entity';
+import { SalesService } from '../sales/sales.service';
 
 @Injectable()
 export class ClientService {
     constructor(
         @Inject('CLIENT_REPOSITORY')
-        private clientRepository: Repository<Client>
+        private clientRepository: Repository<Client>,
+        private salesService: SalesService
     ) {}
 
     async create(clientData: Client): Promise<{ statusCode: number, message: string, client: Client }> {
@@ -77,17 +79,42 @@ export class ClientService {
         };
     }
 
-    async removeClient(id: string): Promise<{ statusCode: number, message: string }> {
+    async removeClient(id: string): Promise<{ statusCode: number, message: string, hasSales?: boolean, salesIds?: number[] }> {
         const clientData = await this.findOneById(id);
         
         if (!clientData) {
             throw new NotFoundException(`Client with ID ${id} not found`);
         }
-        await this.clientRepository.remove(clientData.client);
-        return {
-            statusCode: HttpStatus.OK,
-            message: `Client with ID ${id} deleted successfully`
-        };
+
+        try {
+            // Verificar si el cliente tiene ventas asociadas
+            const allSales = await this.salesService.findAll();
+            const clientSales = allSales.filter(sale => sale.client.id === id);
+
+            if (clientSales.length > 0) {
+                return {
+                    statusCode: HttpStatus.CONFLICT,
+                    message: 'No se puede eliminar el cliente porque tiene ventas asociadas. Por favor, elimine primero las ventas asociadas a este cliente.',
+                    hasSales: true,
+                    salesIds: clientSales.map(sale => sale.id)
+                };
+            }
+
+            await this.clientRepository.remove(clientData.client);
+            return {
+                statusCode: HttpStatus.OK,
+                message: `Cliente con ID ${id} eliminado exitosamente`
+            };
+        } catch (error) {
+            if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+                return {
+                    statusCode: HttpStatus.CONFLICT,
+                    message: 'No se puede eliminar el cliente porque tiene ventas asociadas. Por favor, elimine primero las ventas asociadas a este cliente.',
+                    hasSales: true
+                };
+            }
+            throw error;
+        }
     }
 
     // async removeUser(id: string): Promise<{ statusCode: number, message: string }> {

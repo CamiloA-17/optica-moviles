@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, HttpStatus } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { Client } from './client.entity';
 
@@ -29,7 +29,21 @@ export class ClientController {
 
     @Delete(':id')
     async remove(@Param('id') id: string) {
-        return this.clientsService.removeClient(id);
+        const result = await this.clientsService.removeClient(id);
+        
+        if (result.hasSales) {
+            return {
+                statusCode: HttpStatus.CONFLICT,
+                message: result.message,
+                hasSales: true,
+                salesIds: result.salesIds
+            };
+        }
+
+        return {
+            statusCode: HttpStatus.OK,
+            message: result.message
+        };
     }
 
 }
