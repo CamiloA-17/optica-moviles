@@ -2,6 +2,7 @@ import { Injectable, Inject, NotFoundException, ConflictException, HttpStatus } 
 import { Repository, Not } from 'typeorm';
 import { Client } from './client.entity';
 import { SalesService } from '../sales/sales.service';
+import { CreateClientDto } from './dto/create-client.dto';
 
 @Injectable()
 export class ClientService {
@@ -11,8 +12,7 @@ export class ClientService {
         private salesService: SalesService
     ) {}
 
-    async create(clientData: Client): Promise<{ statusCode: number, message: string, client: Client }> {
-        
+    async create(clientData: CreateClientDto): Promise<{ statusCode: number, message: string, client: Client }> {
         const existingClient = await this.clientRepository.findOne({
             where: [
                 { email: clientData.email },

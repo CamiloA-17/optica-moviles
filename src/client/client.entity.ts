@@ -18,6 +18,9 @@ export class Client {
     @Column({ length: 15, nullable: false, unique: true})
     phone: string;
 
+    @Column({ length: 200, nullable: false})
+    address: string;
+
     @OneToMany(() => ClinicalHistory, (clinicalHistory) => clinicalHistory.client)
     clinicalHistories: ClinicalHistory[];
 }
