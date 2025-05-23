@@ -49,4 +49,10 @@ export class DeviceTokenService {
     async deleteAllTokensByUserId(userId: string): Promise<void> {
         await this.deviceTokenRepository.delete({ userId });
     }
+
+    async findAll() {
+        return this.deviceTokenRepository.find({
+            relations: ['user']
+        });
+    }
 }
