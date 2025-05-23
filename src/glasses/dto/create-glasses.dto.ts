@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 
 export class CreateGlassesDto {
   @IsString()
@@ -11,9 +12,13 @@ export class CreateGlassesDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Type(() => Number)
+  @Transform(({ value }) => Number(value))
   precio: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Type(() => Number)
+  @Transform(({ value }) => Number(value))
   stock: number;
-} 
+}

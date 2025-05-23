@@ -7,6 +7,9 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ParseNumberPipe } from '../common/pipes/parse-number.pipe';
+
+const DEFAULT_IMAGE = 'uploads/glasses/default-glasses.jpg';
 
 @Controller('glasses')
 export class GlassesController {
@@ -25,36 +28,22 @@ export class GlassesController {
     }),
   }))
   async create(
-    @Body() createGlassesDto: any, // Cambiar a any para evitar problemas de validación
+    @Body() createGlassesDto: CreateGlassesDto,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), // 5MB
           new FileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }),
         ],
+        fileIsRequired: false, // La imagen es opcional
       }),
-    ) file: Express.Multer.File,
+    ) file?: Express.Multer.File,
   ) {
-    console.log('Received data:', createGlassesDto); // Log para depuración
-    console.log('Received file:', file); // Log para depuración
-
     try {
-      // Convertir los valores a números si es necesario
-      const precio = typeof createGlassesDto.precio === 'string' 
-        ? parseFloat(createGlassesDto.precio) 
-        : createGlassesDto.precio;
-      
-      const stock = typeof createGlassesDto.stock === 'string' 
-        ? parseInt(createGlassesDto.stock) 
-        : createGlassesDto.stock;
-
       // Crear un nuevo objeto con los valores convertidos
       const glassesData = {
-        marca: createGlassesDto.marca,
-        material: createGlassesDto.material,
-        precio: precio,
-        stock: stock,
-        imagen: file.path // Guardar la ruta relativa
+        ...createGlassesDto,
+        imagen: file ? file.path : DEFAULT_IMAGE
       };
 
       return await this.glassesService.create(glassesData);
@@ -70,7 +59,7 @@ export class GlassesController {
     // Modificar las rutas de las imágenes para que sean URLs completas
     return glasses.map(glass => ({
       ...glass,
-      imagen: `http://192.168.1.13:3000/${glass.imagen}` // Ajusta la URL base según tu configuración
+      imagen: `http://192.168.1.2:3000/${glass.imagen}` // Ajusta la URL base según tu configuración
     }));
   }
 
@@ -105,21 +94,17 @@ export class GlassesController {
     ) file?: Express.Multer.File,
   ) {
     try {
-      // Convertir los valores a números si es necesario
-      const precio = typeof updateGlassesDto.precio === 'string' 
-        ? parseFloat(updateGlassesDto.precio) 
-        : updateGlassesDto.precio;
-      
-      const stock = typeof updateGlassesDto.stock === 'string' 
-        ? parseInt(updateGlassesDto.stock) 
-        : updateGlassesDto.stock;
+      // Usar el ParseNumberPipe para convertir los valores
+      const parseNumberPipe = new ParseNumberPipe();
+      const precio = updateGlassesDto.precio ? parseNumberPipe.transform(updateGlassesDto.precio) : undefined;
+      const stock = updateGlassesDto.stock ? parseNumberPipe.transform(updateGlassesDto.stock) : undefined;
 
       // Crear un nuevo objeto con los valores convertidos
       const glassesData = {
         marca: updateGlassesDto.marca,
         material: updateGlassesDto.material,
-        precio: precio,
-        stock: stock,
+        ...(precio !== undefined && { precio }),
+        ...(stock !== undefined && { stock }),
       };
 
       // Si se proporciona una nueva imagen, actualizar la ruta
