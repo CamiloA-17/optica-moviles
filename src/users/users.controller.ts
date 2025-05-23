@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './users.entity';
 
@@ -22,7 +22,18 @@ export class UsersController {
     }
 
     @Delete(':id')
-    removeUser(@Param('id') id: string) {
-        return this.usersService.deleteUser(id);
+    async removeUser(@Param('id') id: string) {
+        try {
+            const result = await this.usersService.deleteUser(id);
+            return {
+                statusCode: HttpStatus.OK,
+                message: result.message
+            };
+        } catch (error) {
+            return {
+                statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                message: error.message
+            };
+        }
     }
 }

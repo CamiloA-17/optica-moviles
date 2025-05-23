@@ -45,4 +45,8 @@ export class DeviceTokenService {
             return this.deviceTokenRepository.save(token);
         }
     }
+
+    async deleteAllTokensByUserId(userId: string): Promise<void> {
+        await this.deviceTokenRepository.delete({ userId });
+    }
 }
