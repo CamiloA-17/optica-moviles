@@ -70,7 +70,7 @@ export class GlassesController {
     // Modificar las rutas de las imágenes para que sean URLs completas
     return glasses.map(glass => ({
       ...glass,
-      imagen: `http://192.168.1.6:3000/${glass.imagen}` // Ajusta la URL base según tu configuración
+      imagen: `http://192.168.1.13:3000/${glass.imagen}` // Ajusta la URL base según tu configuración
     }));
   }
 

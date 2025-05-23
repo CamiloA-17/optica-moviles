@@ -1,12 +1,14 @@
 import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { User } from './users.entity';
 import { Not, Repository } from 'typeorm';
+import { DeviceTokenService } from '../device-token/device-token.service';
 
 @Injectable()
 export class UsersService {
     constructor(
         @Inject('USER_REPOSITORY')
         private userRepository: Repository<User>,
+        private deviceTokenService: DeviceTokenService,
     ) { }
 
     async findOne(email: string): Promise<User | undefined> {
@@ -40,11 +42,26 @@ export class UsersService {
         return await this.userRepository.save(user);
     }
 
-    async deleteUser(id: string): Promise<void> {
+    async deleteUser(id: string): Promise<{ statusCode: number; message: string }> {
         const user = await this.userRepository.findOne({ where: { id } });
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-        await this.userRepository.remove(user);
+
+        try {
+            // Primero eliminamos todos los tokens del usuario
+            await this.deviceTokenService.deleteAllTokensByUserId(id);
+
+            // Luego eliminamos el usuario
+            await this.userRepository.remove(user);
+
+            return {
+                statusCode: 200,
+                message: `User with ID ${id} deleted successfully`
+            };
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            throw new Error(`Failed to delete user: ${error.message}`);
+        }
     }
 }
